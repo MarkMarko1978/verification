@@ -3,6 +3,8 @@ from discord.ext import commands
 from captcha.image import ImageCaptcha
 import random
 import string
+import os    # Добавлено: для работы с переменными Railway
+import io    # Добавлено: для корректной отправки картинки
 
 # Словарь для временного хранения сгенерированных капчей: {user_id: expected_text}
 pending_captchas = {}
