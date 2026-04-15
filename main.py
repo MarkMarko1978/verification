@@ -115,6 +115,7 @@ bot = MyBot()
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_verify(ctx):
+    gif_url = "https://media.discordapp.net/attachments/1483812220499398717/1491483610291634418/standard_6.gif"
     """Команда для создания сообщения с кнопкой верификации"""
     embed = discord.Embed(
         title="🛡️ Верификация", 
