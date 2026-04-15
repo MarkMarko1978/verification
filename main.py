@@ -113,14 +113,18 @@ bot = MyBot()
 @bot.command()
 @commands.has_permissions(administrator=True)
 async def setup_verify(ctx):
-    """Команда для админов, чтобы создать сообщение с кнопкой верификации"""
+    """Команда для создания сообщения с кнопкой верификации"""
     embed = discord.Embed(
-        title="Верификация",
-        description="Нажми на кнопку ниже, чтобы доказать, что ты не бот и попасть на Ez Squad.",
-        color=discord.Color.blue()
+        title="🛡️ Верификация", 
+        description="Для доступа к серверу нажмите кнопку ниже и решите капчу.",
+        color=discord.Color.green()
     )
     await ctx.send(embed=embed, view=VerifyStartView())
 
+# Берем токен из переменных Railway
+TOKEN = os.getenv('TOKEN')
 
-# Запускаем бота
-bot.run("TOKEN")
+if TOKEN:
+    bot.run(TOKEN)
+else:
+    print("ОШИБКА: Токен не найден в переменных окружения!")
