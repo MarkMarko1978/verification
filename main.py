@@ -16,7 +16,8 @@ def generate_captcha():
     # Генерируем 6 случайных символов (буквы + цифры)
     text = ''.join(random.choices(string.ascii_letters + string.digits, k=6))
     data = image.generate(text)
-    return text, data
+    # Оборачиваем в BytesIO, чтобы Discord смог прочитать файл из памяти
+    return text, io.BytesIO(data.getvalue())
 
 
 class CaptchaModal(discord.ui.Modal, title='Проверка на бота'):
@@ -25,8 +26,8 @@ class CaptchaModal(discord.ui.Modal, title='Проверка на бота'):
         style=discord.TextStyle.short,
         placeholder='Например: Ez87863',
         required=True,
-        min_length=6,
-        max_length=6
+        min_length=1,
+        max_length=10
     )
 
     async def on_submit(self, interaction: discord.Interaction):
@@ -41,24 +42,29 @@ class CaptchaModal(discord.ui.Modal, title='Проверка на бота'):
         if self.answer.value.lower() == expected_text.lower():
             guild = interaction.guild
 
-            # === ВАЖНО: ВСТАВЬ СЮДА СВОИ ID РОЛЕЙ ===
+            # === ТВОИ ID РОЛЕЙ ===
             role_member_id = 1477584227062255627  # ID роли "Участник"
             role_unverified_id = 1486357883800125592  # ID роли "Не верифицирован" (от Juniper)
 
             member_role = guild.get_role(role_member_id)
             unverified_role = guild.get_role(role_unverified_id)
 
-            if member_role:
-                await interaction.user.add_roles(member_role)
-            if unverified_role:
-                await interaction.user.remove_roles(unverified_role)  # Забираем роль, которую выдал Juniper
+            try:
+                if member_role:
+                    await interaction.user.add_roles(member_role)
+                if unverified_role:
+                    await interaction.user.remove_roles(unverified_role)  # Забираем роль, которую выдал Juniper
 
-            await interaction.response.send_message("✅ Верификация успешно пройдена! Добро пожаловать на Ez Squad.", ephemeral=True)
-            # Удаляем капчу из памяти
-            del pending_captchas[interaction.user.id]
+                await interaction.response.send_message("✅ Верификация успешно пройдена! Добро пожаловать на Ez Squad.", ephemeral=True)
+                # Удаляем капчу из памяти
+                if interaction.user.id in pending_captchas:
+                    del pending_captchas[interaction.user.id]
+            except discord.Forbidden:
+                await interaction.response.send_message("❌ Ошибка: У бота нет прав управлять ролями. Проверь иерархию ролей!", ephemeral=True)
         else:
             await interaction.response.send_message("❌ Неверно! Попробуйте еще раз пройти верификацию.", ephemeral=True)
-            del pending_captchas[interaction.user.id]
+            if interaction.user.id in pending_captchas:
+                del pending_captchas[interaction.user.id]
 
 
 class CaptchaAnswerView(discord.ui.View):
@@ -73,7 +79,7 @@ class CaptchaAnswerView(discord.ui.View):
 
 class VerifyStartView(discord.ui.View):
     def __init__(self):
-        # timeout=None делает кнопку вечной (после рестарта на Railway она будет работать)
+        # timeout=None делает кнопку вечной
         super().__init__(timeout=None)
 
     @discord.ui.button(label='Пройти верификацию', style=discord.ButtonStyle.primary, custom_id='start_verify_btn')
@@ -102,7 +108,7 @@ class MyBot(commands.Bot):
         super().__init__(command_prefix='!', intents=intents)
 
     async def setup_hook(self):
-        # Регистрируем главную кнопку, чтобы она не ломалась при рестарте бота на Railway
+        # Регистрируем главную кнопку
         self.add_view(VerifyStartView())
 
     async def on_ready(self):
@@ -122,6 +128,9 @@ async def setup_verify(ctx):
         description="Для того чтобы присоедениться к серверу нажмите кнопку ниже и пройдите капчу.",
         color=discord.Color.green()
     )
+    # Добавляем твою гифку в эмбед
+    embed.set_image(url=gif_url)
+    
     await ctx.send(embed=embed, view=VerifyStartView())
 
 # Берем токен из переменных Railway
