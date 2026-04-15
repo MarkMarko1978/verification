@@ -123,4 +123,4 @@ async def setup_verify(ctx):
 
 
 # Запускаем бота
-bot.run('ТОКЕН')
+bot.run("TOKEN")
