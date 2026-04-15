@@ -118,7 +118,7 @@ async def setup_verify(ctx):
     """Команда для создания сообщения с кнопкой верификации"""
     embed = discord.Embed(
         title="🛡️ Верификация", 
-        description="Для доступа к серверу нажмите кнопку ниже и решите капчу.",
+        description="Для того чтобы присоедениться к серверу нажмите кнопку ниже и пройдите капчу.",
         color=discord.Color.green()
     )
     await ctx.send(embed=embed, view=VerifyStartView())
