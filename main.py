@@ -104,10 +104,13 @@ async def setup_verify(ctx):
     embed = discord.Embed(
         title="🛡️ Верификация", 
         description="Для того чтобы присоединиться к серверу, нажмите кнопку ниже и пройдите капчу.",
-        color=discord.Color.green()
+        # Устанавливаем черный цвет полоски (очень темный серый)
+        color=0x010101
     )
+    # Добавляем твою гифку в эмбед
     embed.set_image(url=gif_url)
     
+    # Отправляем сообщение с черной рамкой и кнопкой
     await ctx.send(embed=embed, view=VerifyStartView())
 
 TOKEN = os.getenv('TOKEN')
