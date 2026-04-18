@@ -36,8 +36,8 @@ class CaptchaModal(discord.ui.Modal, title='Проверка на бота'):
         if self.answer.value.lower() == expected_text.lower():
             guild = interaction.guild
             # ТВОИ ID РОЛЕЙ
-            role_member_id = 1477584227062255627      # Роль "Участник"
-            role_unverified_id = 1486357883800125592  # Роль "Не верифицирован" (от Juniper)
+            role_member_id = 1491087158981693520      # Роль "Участник"
+            role_unverified_id = 1491087158579036308  # Роль "Не верифицирован" (от Juniper)
 
             member_role = guild.get_role(role_member_id)
             unverified_role = guild.get_role(role_unverified_id)
